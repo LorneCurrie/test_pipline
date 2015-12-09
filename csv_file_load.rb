@@ -1,6 +1,6 @@
 require 'csv'
 
-class FileLoad
+class CsvFileLoad
 
   attr_reader :files_arr
 
@@ -11,7 +11,7 @@ class FileLoad
   end
 
   def read_file(file_name)
-    CSV.parse(clean_file(file_name), {headers: @header, header_converters: :symbol})
+    process_file(CSV.parse(clean_file(file_name), {headers: @header, header_converters: :symbol}))
   end
 
   :private
@@ -28,6 +28,19 @@ class FileLoad
       temp_arr << files if %w(.csv .CSV).include?(File.extname(files))
     end
     temp_arr
+  end
+
+  def process_file csv_table
+    array_ret = Array.new
+    csv_table.each do |row|
+      (address_street, suburb) = row[:address].split(',')
+      array_ret << {:address => address_street,
+      :suburb => suburb,
+      :sale_date => row[:sale_date],
+      :amount => row[:amount]
+      }
+    end
+    array_ret
   end
 
 end

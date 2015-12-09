@@ -3,13 +3,19 @@
 require 'csv'
 
 $LOAD_PATH << File.dirname(__FILE__)
-require 'file_load'
+require 'csv_file_load'
 require 'data_queue'
+require 'db_load'
 
-queue1 = DataQueue.new
+queue = DataQueue.new
 
-n = FileLoad.new('.', true)
-file = n.get_csv_files.first
-queue1.set_table(n.read_file(file))
+n = CsvFileLoad.new('.', true)
+n.get_csv_files.each do |file|
+  queue.set_table(n.read_file(file))
+  db = DbLoad.new
+  db.process_pipe_line queue.table
+  queue.set_table(Array.new)
+end
+
 
 
